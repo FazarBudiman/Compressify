@@ -17,7 +17,7 @@ const Compression = () => {
   const [uploadedFile, setUploadedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [compressionResults, setCompressionResults] = useState([]);
-  const [originalFileSize, setOriginalFileSize] = useState(0);
+  const [originalFile, setOriginalFile] = useState([]);
 
   const props = {
     name: "file",
@@ -26,7 +26,25 @@ const Compression = () => {
     action: null,
     beforeUpload: (file) => {
       setUploadedFile(file);
-      setOriginalFileSize(file.size);
+      setOriginalFile([
+        {
+          key: 1,
+          label: "Nama",
+          children: file.name,
+        },
+        {
+          key: 2,
+          label: "Ukuran",
+          children: `${file.size} bytes`,
+          size: file.size,
+        },
+        {
+          key: 3,
+          label: "Tipe/Ekstensi",
+          children: file.type,
+        },
+      ]);
+
       return Upload.LIST_IGNORE;
     },
   };
@@ -46,6 +64,7 @@ const Compression = () => {
       const lzmaCompressedData = await lzma.compress(fileData);
       const lzmaEndTime = performance.now();
 
+      const originalFileSize = originalFile[1].size;
       setCompressionResults([
         {
           method: "Deflate",
@@ -62,7 +81,7 @@ const Compression = () => {
       ]);
     } catch (error) {
       console.error("Error compressing audio", error);
-      message.error("Error compressing audio");
+      message.error("Error compressing audio", error);
     } finally {
       setIsLoading(false);
     }
@@ -79,25 +98,19 @@ const Compression = () => {
   return (
     <Layout>
       <Headers />
-      <Content
-        style={{
-          padding: "0 0px",
-        }}
-      >
+      <Content style={{ background: colorBgContainer }}>
         <div
           style={{
-            background: colorBgContainer,
             minHeight: 280,
             borderRadius: borderRadiusLG,
           }}
         >
-          <h1 style={{ margin: 50 }}>Perbandingan Algoritma Kompresi Lossless (Deflate dan LZMA)</h1>
+          <h1 style={{ margin: "40px 50px" }}>Perbandingan Algoritma Kompresi Lossless (Deflate dan LZMA)</h1>
           <div
             style={{
               width: "60%",
               display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
+              marginLeft: 100,
             }}
           >
             {isLoading ? (
@@ -112,19 +125,17 @@ const Compression = () => {
                     <p className="ant-upload-text">Click or drag file to this area to upload</p>
                   </Dragger>
                 ) : (
-                  <div style={{ marginTop: 16, display: "flex", alignItems: "center", flexDirection: "column", gap: 30 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 30 }}>
-                      <p>
-                        Original File Size: <strong>{originalFileSize}</strong> bytes
-                      </p>
-                      <Button type="primary" danger icon={<DeleteFilled />} onClick={clearFile} />
+                  <div style={{ marginTop: 16 }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 30, marginBottom: 40 }}>
+                      <Descriptions title="Original File" items={originalFile} />
+                      <Button type="primary" danger size="large" icon={<DeleteFilled />} onClick={clearFile} />
                     </div>
                     {compressionResults.length == 0 ? (
                       <Button type="primary" size="large" onClick={handleCompress}>
                         Compress
                       </Button>
                     ) : (
-                      <div style={{ marginTop: 32, marginLeft: 100 }}>
+                      <div style={{ marginTop: 50 }}>
                         <h2>Compression Results:</h2>
                         <div>
                           {compressionResults.map((result, index) => (

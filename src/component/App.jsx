@@ -6,7 +6,6 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Compression />} />
-        {/* <Route path="/compress-audio" element={<Compression />} /> */}
       </Routes>
     </BrowserRouter>
   );
