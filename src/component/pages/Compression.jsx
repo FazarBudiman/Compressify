@@ -1,6 +1,6 @@
 import { Button, Layout, Spin, theme, Descriptions } from "antd";
 const { Content } = Layout;
-import { InboxOutlined, DeleteFilled } from "@ant-design/icons";
+import { InboxOutlined } from "@ant-design/icons";
 import { message, Upload } from "antd";
 import { useState } from "react";
 import pako from "pako";
@@ -69,12 +69,14 @@ const Compression = () => {
         {
           method: "Deflate",
           compressedSize: deflateCompressedData.length,
+          reduksiData: originalFileSize - deflateCompressedData.length,
           percentChange: (originalFileSize - deflateCompressedData.length) / originalFileSize,
           timeTaken: deflateEndTime - deflateStartTime,
         },
         {
           method: "LZMA",
           compressedSize: lzmaCompressedData.length,
+          reduksiData: originalFileSize - lzmaCompressedData.length,
           percentChange: (originalFileSize - lzmaCompressedData.length) / originalFileSize,
           timeTaken: lzmaEndTime - lzmaStartTime,
         },
@@ -105,7 +107,7 @@ const Compression = () => {
             borderRadius: borderRadiusLG,
           }}
         >
-          <h1 style={{ margin: "40px 50px" }}>Perbandingan Algoritma Kompresi Lossless (Deflate dan LZMA)</h1>
+          <h1 style={{ margin: "30px 50px" }}>Perbandingan Algoritma Kompresi Lossless (Deflate dan LZMA)</h1>
           <div
             style={{
               width: "60%",
@@ -122,33 +124,36 @@ const Compression = () => {
                     <p className="ant-upload-drag-icon">
                       <InboxOutlined />
                     </p>
-                    <p className="ant-upload-text">Click or drag file to this area to upload</p>
+                    <p className="ant-upload-text">Klik atau seret file untuk mulai mengunggah!!</p>
                   </Dragger>
                 ) : (
-                  <div style={{ marginTop: 16 }}>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 30, marginBottom: 40 }}>
-                      <Descriptions title="Original File" items={originalFile} />
-                      <Button type="primary" danger size="large" icon={<DeleteFilled />} onClick={clearFile} />
+                  <div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      <Descriptions title=" File Unggahan" items={originalFile} />
+                      <Button type="primary" danger size="large" onClick={clearFile}>
+                        Hapus File
+                      </Button>
                     </div>
                     {compressionResults.length == 0 ? (
-                      <Button type="primary" size="large" onClick={handleCompress}>
-                        Compress
+                      <Button type="primary" size="large" onClick={handleCompress} style={{ marginTop: 40 }}>
+                        Mulai Kompresi
                       </Button>
                     ) : (
                       <div style={{ marginTop: 50 }}>
-                        <h2>Compression Results:</h2>
+                        <h2>Hasil Kompresi:</h2>
                         <div>
                           {compressionResults.map((result, index) => (
-                            <Descriptions title={result.method} key={index}>
+                            <Descriptions title={result.method} key={index} style={{ margin: "20px 0px 0px" }}>
                               <Descriptions.Item label="Ukuran File">{result.compressedSize} bytes</Descriptions.Item>
-                              <Descriptions.Item label="Persentase Perubahan">{result.percentChange.toFixed(3) * 100} %</Descriptions.Item>
+                              <Descriptions.Item label="Data yang Dikurangi">{result.reduksiData} bytes</Descriptions.Item>
+                              <Descriptions.Item label="Persentase Kompresi">{result.percentChange.toFixed(3) * 100} %</Descriptions.Item>
                               <Descriptions.Item label="Waktu yang Dibutuhkan">{result.timeTaken.toFixed(2)} ms</Descriptions.Item>
                             </Descriptions>
                           ))}
                         </div>
 
                         <Button type="primary" danger onClick={clearResults}>
-                          Clear Results
+                          Hapus Hasil Kompresi
                         </Button>
                       </div>
                     )}
